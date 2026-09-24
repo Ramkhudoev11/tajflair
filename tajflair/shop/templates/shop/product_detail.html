@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.title }} — Tajflair</title>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            display: flex;
+            gap: 40px;
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 12px;
+        }
+        .images {
+            width: 50%;
+        }
+        .images img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .details {
+            width: 50%;
+        }
+        .price {
+            font-size: 24px;
+            color: #e63946;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #aaa;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="max-width: 900px; margin: 0 auto;">
+        <a href="{% url 'home' %}" class="btn-back">← Назад в каталог</a>
+    </div>
+
+    <div class="container">
+        <div class="images">
+            {% if product.images.first %}
+                <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}">
+            {% else %}
+                <img src="https://via.placeholder.com/400" alt="Нет фото">
+            {% endif %}
+        </div>
+        <div class="details">
+            <h1>{{ product.title }}</h1>
+            <a href="{% url 'cart_add' product.id %}" style="display:inline-block; padding: 12px 24px; background: #8b0000; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px;">
+            Добавить в корзину</a>
+            <div class="price">{{ product.price }} TJS</div>
+            <p>{{ product.description|linebreaks }}</p>
+        </div>
+    </div>
+
+</body>
+</html>

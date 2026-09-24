@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Корзина — Tajflair</title>
+    <style>
+        body { background: #0d0d0d; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: #1a1a1a; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        .btn { padding: 10px 20px; background: #8b0000; color: white; text-decoration: none; border-radius: 4px; display: inline-block; }
+        .btn-del { color: #ff4d4d; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Ваша корзина</h2>
+        {% if cart %}
+            <table>
+                <tr>
+                    <th>Товар</th>
+                    <th>Кол-во</th>
+                    <th>Цена</th>
+                    <th>Сумма</th>
+                    <th>Action</th>
+                </tr>
+                {% for item in cart %}
+                <tr>
+                    <td>{{ item.product.title }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.price }} TJS</td>
+                    <td>{{ item.total_price }} TJS</td>
+                    <td><a href="{% url 'cart_remove' item.product.id %}" class="btn-del">Удалить</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            <h3>Итого: {{ cart.get_total_price }} TJS</h3>
+            <a href="{% url 'order_create' %}" class="btn">Оформить заказ</a>
+        {% else %}
+            <p>Корзина пуста. <a href="{% url 'home' %}" style="color:red;">Перейти в каталог</a></p>
+        {% endif %}
+    </div>
+</body>
+</html>

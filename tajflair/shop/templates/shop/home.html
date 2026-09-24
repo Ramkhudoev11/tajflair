@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tajflair — Тяжелый люкс</title>
+    <style>
+    :root {
+        --bg-color: #0d0d0d;
+        --card-bg: #1a1a1a;
+        --accent-color: #8b0000;
+        --text-color: #ffffff;
+        --subtext-color: #a0a0a0;
+    }
+
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+
+    header {
+        background-color: #000;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--accent-color);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .logo h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 2px;
+    }
+
+    .cart-link {
+        background-color: var(--accent-color);
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 13px;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 15px;
+    }
+
+    /* Меню категорий */
+    .categories-nav {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .category-badge {
+        padding: 8px 16px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--accent-color);
+        border-radius: 20px;
+        color: #fff;
+        text-decoration: none;
+        white-space: nowrap;
+        font-size: 14px;
+    }
+
+    /* Адаптивная сетка карточек */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+    }
+
+    @media (min-width: 600px) {
+        .products-grid {
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 20px;
+        }
+    }
+
+    .product-card {
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #222;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    @media (min-width: 600px) {
+        .product-card img {
+            height: 280px;
+        }
+    }
+
+    .product-info {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .product-title h3 {
+        font-size: 14px;
+        margin: 0 0 8px 0;
+        color: #fff;
+        font-weight: 500;
+    }
+
+    .product-price {
+        font-size: 16px;
+        font-weight: bold;
+        color: #e63946;
+        margin-bottom: 12px;
+    }
+
+    .btn-add-cart {
+        background-color: var(--accent-color);
+        color: white;
+        text-align: center;
+        padding: 8px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 13px;
+        margin-top: auto;
+    }
+</style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <h1>TAJFLAIR</h1>
+        </div>
+        <!-- Иконка корзины в шапке -->
+        <a href="{% url 'cart_detail' %}" class="cart-link">
+            🛒 Корзина ({{ cart|length }})
+        </a>
+    </header>
+
+    <div class="container">
+        <div class="categories-nav">
+            {% for cat in categories %}
+                <a href="#" class="category-badge">{{ cat.name }}</a>
+            {% empty %}
+                <span class="category-badge">Все товары</span>
+            {% endfor %}
+        </div>
+
+        <h2>Каталог</h2>
+        <div class="products-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    <a href="{% url 'product_detail' slug=product.slug %}">
+                        {% if product.images.first %}
+                            <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300" alt="Нет фото">
+                        {% endif %}
+                    </a>
+                    <div class="product-info">
+                        <a href="{% url 'product_detail' slug=product.slug %}" class="product-title">
+                            <h3>{{ product.title }}</h3>
+                        </a>
+                        <div class="product-price">{{ product.price }} TJS</div>
+                        <!-- Кнопка добавить в корзину -->
+                        <a href="{% url 'cart_add' product.id %}" class="btn-add-cart">В корзину</a>
+                    </div>
+                </div>
+            {% empty %}
+                <p>Товары не найдены.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>

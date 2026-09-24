@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Оформление заказа — Tajflair</title>
+    <style>
+        body { background: #0d0d0d; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; background: #1a1a1a; padding: 25px; border-radius: 8px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0 20px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-radius; }
+        button { width: 100%; padding: 12px; background: #8b0000; color: #fff; border: none; font-size: 16px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Оформление заказа</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label>Ваше Имя:</label>
+            <input type="text" name="full_name" required>
+
+            <label>Номер телефона:</label>
+            <input type="text" name="phone" placeholder="+992..." required>
+
+            <label>Адрес доставки:</label>
+            <textarea name="address" rows="3" required></textarea>
+
+            <button type="submit">Подтвердить заказ</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,21 +1,13 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Заказ принят — Tajflair</title>
-    <style>
-        body { background: #0d0d0d; color: #fff; font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
-        .card { max-width: 500px; margin: 0 auto; background: #1a1a1a; padding: 30px; border-radius: 8px; }
-        a { color: #e63946; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h1>Спасибо за заказ!</h1>
-        <p>Ваш заказ <strong>№{{ order.id }}</strong> успешно оформлен.</p>
-        <p>Наш менеджер свяжется с вами в ближайшее время по номеру <strong>{{ order.phone }}</strong>.</p>
-        <br>
-        <a href="{% url 'home' %}">← Вернуться на главную</a>
-    </div>
-</body>
-</html>
+{% extends 'shop/base.html' %}
+
+{% block title %}Оформление заказа — Tajflair{% endblock %}
+
+{% block content %}
+<h2>Оформление заказа</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn-submit">Подтвердить и отправить заказ</button>
+</form>
+{% endblock %}

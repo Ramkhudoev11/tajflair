@@ -1,0 +1,32 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card bg-dark text-light border-secondary p-4 shadow">
+                <h3 class="text-center text-warning mb-4">Вход в аккаунт</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Имя пользователя (Логин)</label>
+                        <input type="text" name="username" class="form-control bg-dark text-light border-secondary" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" name="password" class="form-control bg-dark text-light border-secondary" required>
+                    </div>
+                    {% if form.errors %}
+                        <div class="alert alert-danger p-2 small">Неверный логин или пароль</div>
+                    {% endif %}
+                    <button type="submit" class="btn btn-warning w-100 fw-bold mt-3">Войти</button>
+                </form>
+                <div class="text-center mt-3">
+                    <span class="text-secondary">Еще нет аккаунта?</span>
+                    <a href="{% url 'register' %}" class="text-warning text-decoration-none">Зарегистрироваться</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card bg-dark text-light border-secondary p-4 shadow">
+                <h3 class="text-center text-warning mb-4">Регистрация</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-warning w-100 fw-bold mt-3">Зарегистрироваться</button>
+                </form>
+                <div class="text-center mt-3">
+                    <span class="text-secondary">Уже есть аккаунт?</span>
+                    <a href="{% url 'login' %}" class="text-warning text-decoration-none">Войти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,36 +1,117 @@
-{% extends 'shop/base.html' %}
-{% load static %}
+{% extends 'base.html' %}
+
+{% block title %}{{ product.title }} — TajFlair{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <a href="{% url 'home' %}" class="btn btn-outline-secondary mb-4">&larr; Назад к товарам</a>
+<div class="container my-5">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-warning text-decoration-none">Главная</a></li>
+            {% if product.category %}
+                <li class="breadcrumb-item"><a href="{% url 'product_list_by_category' product.category.slug %}" class="text-warning text-decoration-none">{{ product.category.name }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active text-light" aria-current="page">{{ product.title }}</li>
+        </ol>
+    </nav>
 
-    <div class="card bg-dark text-light border-secondary shadow-lg">
-        <div class="card-body p-4">
-            <div class="row align-items-center">
-                <!-- Картинка товара -->
-                <div class="col-md-5 text-center mb-3 mb-md-0">
-                    {% if product.image %}
-                        <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.title }}" style="max-height: 350px; object-fit: contain; background-color: #1a1a1a;">
-                    {% else %}
-                        <div class="d-flex justify-content-center align-items-center bg-secondary rounded" style="height: 300px;">
-                            <span class="text-white-50">Нет фото</span>
-                        </div>
-                    {% endif %}
+    <!-- Карточка товара -->
+    <div class="row bg-dark text-light border border-secondary rounded p-4 shadow">
+        <div class="col-md-6 text-center mb-4 mb-md-0">
+            {% if product.get_image_url %}
+                <img src="{{ product.get_image_url }}" alt="{{ product.title }}" class="img-fluid rounded border border-secondary p-2 bg-dark" style="max-height: 400px; object-fit: contain;">
+            {% else %}
+                <div class="bg-secondary text-center py-5 rounded" style="min-height: 300px;">
+                    <span class="text-light fs-4">Нет изображения</span>
                 </div>
-
-                <!-- Информация о товаре -->
-                <div class="col-md-7">
-                    <h2 class="fw-bold mb-3">{{ product.title }}</h2>
-                    <h3 class="text-warning fw-bold mb-4">{{ product.price }} TJS</h3>
-
-                    <h5 class="text-secondary">Описание:</h5>
-                    <p class="card-text mb-4">{{ product.description|default:"Описание товара пока не добавлено." }}</p>
-
-                    <a href="{% url 'cart_add' product.id %}" class="btn btn-warning btn-lg fw-bold px-4">Добавить в корзину</a>
-                </div>
-            </div>
+            {% endif %}
         </div>
+
+        <div class="col-md-6 d-flex flex-column justify-content-between">
+            <div>
+                <h1 class="text-warning fw-bold mb-3">{{ product.title }}</h1>
+
+                <!-- Средний рейтинг товара -->
+                <div class="mb-3">
+                    <span class="text-warning fs-5">
+                        ★ {{ product.get_average_rating }}
+                    </span>
+                    <span class="text-secondary ms-2">({{ reviews.count }} отзывов)</span>
+                </div>
+
+                <h3 class="fw-bold mb-3">{{ product.price }} TJS</h3>
+
+                {% if product.is_available %}
+                    <span class="badge bg-success mb-3">В наличии</span>
+                {% else %}
+                    <span class="badge bg-danger mb-3">Нет в наличии</span>
+                {% endif %}
+
+                <p class="text-light mt-3">{{ product.description|linebreaks }}</p>
+            </div>
+
+            <!-- Форма добавления в корзину -->
+            {% if product.is_available %}
+                <form action="{% url 'cart_add' product.id %}" method="get" class="d-flex align-items-center mt-4">
+                    <input type="number" name="quantity" value="1" min="1" class="form-control bg-dark text-light border-secondary me-3" style="width: 90px;">
+                    <button type="submit" class="btn btn-warning fw-bold px-4">Добавить в корзину</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Блок отзывов и оценок -->
+    <div class="mt-5 card bg-dark text-light border-secondary p-4 shadow">
+        <h4 class="text-warning mb-4">Отзывы и оценки</h4>
+
+        {% if user.is_authenticated %}
+            <form method="post" class="mb-4 p-3 border border-secondary rounded">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Ваша оценка:</label>
+                    <select name="rating" class="form-select bg-dark text-light border-secondary" style="max-width: 180px;" required>
+                        <option value="5">5 ⭐⭐⭐⭐⭐</option>
+                        <option value="4">4 ⭐⭐⭐⭐</option>
+                        <option value="3">3 ⭐⭐⭐</option>
+                        <option value="2">2 ⭐⭐</option>
+                        <option value="1">1 ⭐</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Ваш отзыв:</label>
+                    <textarea name="comment" class="form-control bg-dark text-light border-secondary" rows="3" required placeholder="Напишите ваше впечатление о товаре..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-warning fw-bold">Оставить отзыв</button>
+            </form>
+        {% else %}
+            <p class="text-secondary">
+                <a href="{% url 'login' %}" class="text-warning text-decoration-none">Войдите в аккаунт</a>, чтобы оставить отзыв.
+            </p>
+        {% endif %}
+
+        <hr class="border-secondary my-4">
+
+        <!-- Список отзывов -->
+        {% if reviews %}
+            <div class="d-flex flex-column gap-3">
+                {% for review in reviews %}
+                    <div class="p-3 border border-secondary rounded bg-dark">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong class="text-warning">{{ review.user.username }}</strong>
+                            <span class="text-warning">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <p class="mb-2 text-light">{{ review.comment }}</p>
+                        <small class="text-secondary">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-secondary mb-0">У этого товара пока нет отзывов. Будьте первым!</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

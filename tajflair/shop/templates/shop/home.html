@@ -1,55 +1,111 @@
-{% extends 'shop/base.html' %}
-{% load static %}
+{% extends 'base.html' %}
+
+{% block title %}Главная — TajFlair{% endblock %}
 
 {% block content %}
-<div class="container py-3">
-    <!-- Кнопки категорий (Обувь, Футболки, Штаны и т.д.) -->
-    {% if categories %}
-    <div class="d-flex gap-2 mb-4 overflow-auto pb-2 justify-content-center flex-wrap">
-        <a href="{% url 'home' %}" class="btn {% if not category %}btn-warning fw-bold{% else %}btn-outline-warning{% endif %}">
-            Все товары
-        </a>
-        {% for cat in categories %}
-            <a href="{% url 'product_list_by_category' cat.slug %}"
-               class="btn {% if category.id == cat.id %}btn-warning fw-bold{% else %}btn-outline-warning{% endif %}">
-                {{ cat.name }}
-            </a>
-        {% endfor %}
+<div class="container my-4">
+
+    <!-- Форма поиска и заголовок -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <h2 class="text-warning fw-bold m-0">
+                {% if category %}
+                    {{ category.name }}
+                {% else %}
+                    Все товары
+                {% endif %}
+            </h2>
+        </div>
+        <div class="col-md-6">
+            <form method="get" action="{% url 'home' %}" class="d-flex">
+                <input type="text" name="q" value="{{ query|default:'' }}" class="form-control bg-dark text-light border-secondary me-2" placeholder="Поиск товаров...">
+                <button type="submit" class="btn btn-warning">Искать</button>
+            </form>
+        </div>
     </div>
-    {% endif %}
 
-    <h3 class="mb-4 text-warning">
-        {% if category %}{{ category.name }}{% else %}Каталог товаров{% endif %}
-    </h3>
-
-    <!-- Список товаров -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        {% for product in products %}
-        <div class="col">
-            <div class="card h-100 bg-dark text-light border-secondary shadow-sm">
-                <a href="{% url 'product_detail' product.id %}" class="text-decoration-none">
-                    {% if product.image %}
-                        <img src="{{ product.image.url }}" class="card-img-top p-3" alt="{{ product.title }}" style="height: 220px; object-fit: contain; background-color: #1a1a1a;">
-                    {% else %}
-                        <div class="d-flex justify-content-center align-items-center bg-secondary text-light" style="height: 220px;">
-                            <span class="text-white-50">Нет фото</span>
-                        </div>
-                    {% endif %}
+    <div class="row">
+        <!-- Навигация по категориям (Сайдбар) -->
+        <div class="col-lg-3 mb-4">
+            <div class="list-group shadow">
+                <a href="{% url 'home' %}" class="list-group-item list-group-item-action bg-dark text-light border-secondary {% if not category %}active bg-warning text-dark border-warning fw-bold{% endif %}">
+                    Все категории
                 </a>
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <div>
-                        <h6 class="card-title text-light mb-2 text-truncate">{{ product.title }}</h6>
-                        <h5 class="fw-bold text-warning mb-3">{{ product.price }} TJS</h5>
-                    </div>
-                    <a href="{% url 'cart_add' product.id %}" class="btn btn-warning w-100 fw-bold">В корзину</a>
-                </div>
+                {% for cat in categories %}
+                    <a href="{% url 'product_list_by_category' cat.slug %}" class="list-group-item list-group-item-action bg-dark text-light border-secondary {% if category and category.slug == cat.slug %}active bg-warning text-dark border-warning fw-bold{% endif %}">
+                        {{ cat.name }}
+                    </a>
+                {% endfor %}
             </div>
         </div>
-        {% empty %}
-        <div class="col-12">
-            <p class="text-light fs-5">Товары в этой категории пока не добавлены.</p>
+
+        <!-- Сетка товаров -->
+        <div class="col-lg-9">
+            {% if products %}
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                    {% for product in products %}
+                        <div class="col">
+                            <div class="card h-100 bg-dark text-light border-secondary shadow-sm">
+                                {% if product.get_image_url %}
+                                    <img src="{{ product.get_image_url }}" class="card-img-top p-3 rounded" alt="{{ product.title }}" style="height: 220px; object-fit: contain;">
+                                {% else %}
+                                    <div class="bg-secondary text-center py-5 rounded-top" style="height: 220px;">
+                                        <span class="text-light">Нет фото</span>
+                                    </div>
+                                {% endif %}
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-warning h6 fw-bold">{{ product.title }}</h5>
+                                    <p class="card-text text-secondary small flex-grow-1">
+                                        {{ product.description|truncatewords:10 }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="fs-5 fw-bold text-light">{{ product.price }} TJS</span>
+                                        <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-warning btn-sm">Подробнее</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Блок Пагинации -->
+                {% if products.has_other_pages %}
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if products.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link bg-dark text-light border-secondary" href="?page={{ products.
+previous_page_number }}{% if query %}&q={{ query }}{% endif %}">« Назад</a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in products.paginator.page_range %}
+                                {% if products.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link bg-warning text-dark border-warning fw-bold">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link bg-dark text-light border-secondary" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if products.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link bg-dark text-light border-secondary" href="?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Вперед »</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="alert alert-dark text-center border-secondary text-light">
+                    Товары не найдены.
+                </div>
+            {% endif %}
         </div>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}

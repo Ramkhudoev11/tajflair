@@ -1,13 +1,14 @@
 {% extends 'shop/base.html' %}
 
-{% block title %}Оформление заказа — Tajflair{% endblock %}
-
 {% block content %}
-<h2>Оформление заказа</h2>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn-submit">Подтвердить и отправить заказ</button>
-</form>
+<div class="container py-5 text-center text-light">
+    <div class="card bg-dark border-success shadow p-5 mx-auto" style="max-width: 500px;">
+        <h1 class="text-success mb-3">✅ Заказ успешно оформлен!</h1>
+        <p class="fs-5 mb-4">Спасибо за заказ, <strong>{{ order.full_name }}</strong>! Номер вашего заказа: <strong>#{{ order.id }}</strong>.</p>
+        <p class="text-secondary mb-4">Наш менеджер свяжется с вами по номеру {{ order.phone }} для подтверждения доставки.</p>
+        <div>
+            <a href="{% url 'home' %}" class="btn btn-warning btn-lg fw-bold px-4">Вернуться в магазин</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

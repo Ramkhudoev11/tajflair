@@ -3,19 +3,24 @@
 
 {% block content %}
 <div class="container py-3">
-    <!-- Категории -->
+    <!-- Кнопки категорий (Обувь, Футболки, Штаны и т.д.) -->
     {% if categories %}
-    <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
-        <a href="{% url 'home' %}" class="btn btn-outline-warning btn-sm {% if not category %}active{% endif %}">Все товары</a>
+    <div class="d-flex gap-2 mb-4 overflow-auto pb-2 justify-content-center flex-wrap">
+        <a href="{% url 'home' %}" class="btn {% if not category %}btn-warning fw-bold{% else %}btn-outline-warning{% endif %}">
+            Все товары
+        </a>
         {% for cat in categories %}
-            <a href="{% url 'product_list_by_category' cat.slug %}" class="btn btn-outline-warning btn-sm {% if category.id == cat.id %}active{% endif %}">
+            <a href="{% url 'product_list_by_category' cat.slug %}"
+               class="btn {% if category.id == cat.id %}btn-warning fw-bold{% else %}btn-outline-warning{% endif %}">
                 {{ cat.name }}
             </a>
         {% endfor %}
     </div>
     {% endif %}
 
-    <h3 class="mb-4 text-warning">Каталог товаров</h3>
+    <h3 class="mb-4 text-warning">
+        {% if category %}{{ category.name }}{% else %}Каталог товаров{% endif %}
+    </h3>
 
     <!-- Список товаров -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
@@ -42,7 +47,7 @@
         </div>
         {% empty %}
         <div class="col-12">
-            <p class="text-light fs-5">Товары пока не добавлены.</p>
+            <p class="text-light fs-5">Товары в этой категории пока не добавлены.</p>
         </div>
         {% endfor %}
     </div>

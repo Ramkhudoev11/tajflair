@@ -1,44 +1,96 @@
 {% extends 'shop/base.html' %}
-
-{% block title %}Ваша корзина — Tajflair{% endblock %}
+{% load static %}
 
 {% block content %}
-<h2>Ваша корзина</h2>
+<div class="container py-4 text-light">
+    <h2 class="mb-4 text-warning">Ваша корзина</h2>
 
-{% if cart %}
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>Товар</th>
-                    <th>Кол-во</th>
-                    <th>Цена</th>
-                    <th>Сумма</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart %}
-                    <tr>
-                        <td>{{ item.product.name }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>{{ item.price }} TJS</td>
-                        <td>{{ item.total_price }} TJS</td>
-                        <td>
-                            <a href="{% url 'cart_remove' item.product.id %}" class="btn-remove">Удалить</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    {% if cart %}
+    <div class="row g-4">
+        <!-- Список товаров в корзине -->
+        <div class="col-lg-8">
+            <div class="card bg-dark text-light border-secondary shadow">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead class="table-borderless border-bottom border-secondary">
+                                <tr class="text-secondary">
+                                    <th scope="col" class="ps-3">Товар</th>
+                                    <th scope="col">Цена</th>
+                                    <th scope="col" class="text-center">Кол-во</th>
+                                    <th scope="col">Итого</th>
+                                    <th scope="col" class="text-end pe-3">Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart %}
+                                <tr>
+                                    <td class="ps-3">
+                                        <div class="d-flex align-items-center">
+                                            {% if item.product.image %}
+                                                <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-secondary rounded me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                                    <small class="text-white-50">Нет фото</small>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <a href="{% url 'product_detail' item.product.id %}" class="text-light text-decoration-none fw-bold d-block">{{ item.product.title }}</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ item.price }} TJS</td>
+                                    <td class="text-center fw-bold">{{ item.quantity }}</td>
+                                    <td class="text-warning fw-bold">{{ item.total_price }} TJS</td>
+                                    <td class="text-end pe-3">
+                                        <a href="{% url 'cart_remove' item.product.id %}" class="btn btn-outline-danger btn-sm">&times; Удалить</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-dark border-secondary p-3 d-flex justify-content-between align-items-center">
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">&larr; Продолжить покупки</a>
+                    <a href="{% url 'cart_clear' %}" class="btn btn-outline-warning btn-sm">Очистить корзину</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Итоговый блок оплаты -->
+        <div class="col-lg-4">
+            <div class="card bg-dark text-light border-secondary shadow">
+                <div class="card-header bg-dark border-secondary py-3">
+                    <h5 class="mb-0 text-warning">Детали заказа</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Товары ({{ cart|length }})</span>
+                        <span>{{ cart.get_total_price }} TJS</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-secondary">Доставка</span>
+                        <span class="text-success fw-bold">Бесплатно</span>
+                    </div>
+                    <hr class="border-secondary">
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fs-5 fw-bold">Итого к оплате</span>
+                        <span class="fs-4 fw-bold text-warning">{{ cart.get_total_price }} TJS</span>
+                    </div>
+                    <a href="{% url 'checkout' %}" class="btn btn-warning w-100 btn-lg fw-bold">Оформить заказ &rarr;</a>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="total-price">
-        Итого: {{ cart.get_total_price }} TJS
+    {% else %}
+    <div class="card bg-dark text-light border-secondary p-5 text-center shadow">
+        <h4 class="mb-3">Ваша корзина пуста 🛒</h4>
+        <p class="text-secondary mb-4">Вы пока не добавили ни одного товара.</p>
+        <div>
+            <a href="{% url 'home' %}" class="btn btn-warning px-4 fw-bold">Перейти в каталог</a>
+        </div>
     </div>
-
-    <a href="{% url 'order_create' %}" class="btn-action">Оформить заказ</a>
-{% else %}
-    <p>Корзина пуста</p>
-{% endif %}
+    {% endif %}
+</div>
 {% endblock %}

@@ -1,31 +1,36 @@
 {% extends 'shop/base.html' %}
-
-{% block title %}{{ product.name }} — Tajflair{% endblock %}
+{% load static %}
 
 {% block content %}
-<div class="product-detail-card">
-    {% if product.image %}
-        <div class="product-detail-image-wrapper">
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-detail-image">
-        </div>
-    {% endif %}
+<div class="container py-4">
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary mb-4">&larr; Назад к товарам</a>
 
-    <div class="product-detail-info">
-        <h2>{{ product.name }}</h2>
-        <p class="product-price">{{ product.price }} TJS</p>
+    <div class="card bg-dark text-light border-secondary shadow-lg">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <!-- Картинка товара -->
+                <div class="col-md-5 text-center mb-3 mb-md-0">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.title }}" style="max-height: 350px; object-fit: contain; background-color: #1a1a1a;">
+                    {% else %}
+                        <div class="d-flex justify-content-center align-items-center bg-secondary rounded" style="height: 300px;">
+                            <span class="text-white-50">Нет фото</span>
+                        </div>
+                    {% endif %}
+                </div>
 
-        {% if product.description %}
-            <div class="product-description">
-                <p>{{ product.description|linebreaks }}</p>
+                <!-- Информация о товаре -->
+                <div class="col-md-7">
+                    <h2 class="fw-bold mb-3">{{ product.title }}</h2>
+                    <h3 class="text-warning fw-bold mb-4">{{ product.price }} TJS</h3>
+
+                    <h5 class="text-secondary">Описание:</h5>
+                    <p class="card-text mb-4">{{ product.description|default:"Описание товара пока не добавлено." }}</p>
+
+                    <a href="{% url 'cart_add' product.id %}" class="btn btn-warning btn-lg fw-bold px-4">Добавить в корзину</a>
+                </div>
             </div>
-        {% endif %}
-
-        <form action="{% url 'cart_add' product.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn-action">Добавить в корзину</button>
-        </form>
-
-        <a href="{% url 'product_list' %}" class="btn-back">← Назад в каталог</a>
+        </div>
     </div>
 </div>
 {% endblock %}

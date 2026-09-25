@@ -1,28 +1,50 @@
 {% extends 'shop/base.html' %}
-
-{% block title %}Tajflair — Главная{% endblock %}
+{% load static %}
 
 {% block content %}
-<h2>Каталог товаров</h2>
+<div class="container py-3">
+    <!-- Категории -->
+    {% if categories %}
+    <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+        <a href="{% url 'home' %}" class="btn btn-outline-warning btn-sm {% if not category %}active{% endif %}">Все товары</a>
+        {% for cat in categories %}
+            <a href="{% url 'product_list_by_category' cat.slug %}" class="btn btn-outline-warning btn-sm {% if category.id == cat.id %}active{% endif %}">
+                {{ cat.name }}
+            </a>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-<div class="products-grid">
-    {% for product in products %}
-        <div class="product-card">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
-            {% endif %}
-            <div class="product-info">
-                <h3 class="product-title">{{ product.name }}</h3>
-                <p class="product-price">{{ product.price }} TJS</p>
+    <h3 class="mb-4 text-warning">Каталог товаров</h3>
 
-                <form action="{% url 'cart_add' product.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-action">В корзину</button>
-                </form>
+    <!-- Список товаров -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 bg-dark text-light border-secondary shadow-sm">
+                <a href="{% url 'product_detail' product.id %}" class="text-decoration-none">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top p-3" alt="{{ product.title }}" style="height: 220px; object-fit: contain; background-color: #1a1a1a;">
+                    {% else %}
+                        <div class="d-flex justify-content-center align-items-center bg-secondary text-light" style="height: 220px;">
+                            <span class="text-white-50">Нет фото</span>
+                        </div>
+                    {% endif %}
+                </a>
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h6 class="card-title text-light mb-2 text-truncate">{{ product.title }}</h6>
+                        <h5 class="fw-bold text-warning mb-3">{{ product.price }} TJS</h5>
+                    </div>
+                    <a href="{% url 'cart_add' product.id %}" class="btn btn-warning w-100 fw-bold">В корзину</a>
+                </div>
             </div>
         </div>
-    {% empty %}
-        <p>Товары пока не добавлены.</p>
-    {% endfor %}
+        {% empty %}
+        <div class="col-12">
+            <p class="text-light fs-5">Товары пока не добавлены.</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
